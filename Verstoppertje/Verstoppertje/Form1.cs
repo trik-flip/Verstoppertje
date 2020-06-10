@@ -18,85 +18,201 @@ namespace Verstoppertje
 {
     public partial class Zoeker_App : Form
     {
-        private readonly string url = "http://localhost:8080/json.htm?username=cm9vdA==&password=cm9vdA==&";
-        private string singelDevice = "type=devices&rid=";
-        private WebClient client = new WebClient();
-        private List<Switch> switches = new List<Switch>();
+        private Game game;
+        /// <summary>
+        /// Runs front-end and opens Back-end in another Thread
+        /// </summary>
         public Zoeker_App()
         {
             InitializeComponent();
-            Listener listener = new Listener(this);
-            listener.start();
+            game = new Game(this);
+            game.Start();
         }
+        
+        /// <summary>
+        /// Set's the picture displayd in the camera Feed pictureBox
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void button1_Click(object sender, EventArgs e)
         {
-            if(SelectCameraFeed.Text == "Kitchen")
-                this.CameraFeed.Image = Properties.Resources.Kitchen;
-            else if(SelectCameraFeed.Text == "Living")
-                this.CameraFeed.Image = Properties.Resources.Living;
-            else if(SelectCameraFeed.Text == "Family")
-                this.CameraFeed.Image = Properties.Resources.Family;
-            else if(SelectCameraFeed.Text == "Pantry")
-                this.CameraFeed.Image = Properties.Resources.Pantry;
-            else if(SelectCameraFeed.Text == "Bathroom")
-                this.CameraFeed.Image = Properties.Resources.Bathroom;
-            else if(SelectCameraFeed.Text == "Entrance")
-                this.CameraFeed.Image = Properties.Resources.Entrance;
-            else if(SelectCameraFeed.Text == "Entrance 2")
-                this.CameraFeed.Image = Properties.Resources.Entrance_2;
-            else if(SelectCameraFeed.Text == "Laundry")
-                this.CameraFeed.Image = Properties.Resources.Laundry;
+            if(game != null && game.CameraCheck())
+            {
+                if(SelectCameraFeed.Text == "Kitchen")
+                    CameraFeed.Image = Properties.Resources.Kitchen;
+                else if(SelectCameraFeed.Text == "Living")
+                    CameraFeed.Image = Properties.Resources.Living;
+                else if(SelectCameraFeed.Text == "Family")
+                    CameraFeed.Image = Properties.Resources.Family;
+                else if(SelectCameraFeed.Text == "Pantry")
+                    CameraFeed.Image = Properties.Resources.Pantry;
+                else if(SelectCameraFeed.Text == "Bathroom")
+                    CameraFeed.Image = Properties.Resources.Bathroom;
+                else if(SelectCameraFeed.Text == "Entrance")
+                    CameraFeed.Image = Properties.Resources.Entrance;
+                else if(SelectCameraFeed.Text == "Entrance 2")
+                    CameraFeed.Image = Properties.Resources.Entrance_2;
+                else if(SelectCameraFeed.Text == "Laundry")
+                    CameraFeed.Image = Properties.Resources.Laundry;
+            }
         }
+        
+        #region RichTextBox
+        /// <summary>
+        /// Is used to add text to the RichTextBox
+        /// is used by another Thread
+        /// </summary>
+        /// <param name="s"></param>
         public void addToRichTextBox(string s)
         {
             if(InvokeRequired)
             {
-                this.Invoke(new Action<string>(addToRichTextBox), new object[] { s });
+                Invoke(new Action<string>(addToRichTextBox), new object[] { s });
                 return;
             }
             richTextBox1.Text += s;
         }
+        /// <summary>
+        /// Is used to set the text of the RichTextBox
+        /// Is used by another Thread
+        /// </summary>
+        /// <param name="s"></param>
         public void SetRichTextBox(string s)
         {
             if(InvokeRequired)
             {
-                this.Invoke(new Action<string>(SetRichTextBox), new object[] { s });
+                Invoke(new Action<string>(SetRichTextBox), new object[] { s });
                 return;
             }
             richTextBox1.Text = s;
         }
-        private void pictureBox_Kitchen_Click(object sender, EventArgs e)
-        {
-
-        }
+        #endregion
+        
+        /// <summary>
+        /// Is used by the Game class, to set a picture to the Front-end
+        /// Is used by another Thread then the Front-end is run by
+        /// </summary>
+        /// <param name="image"></param>
+        /// <param name="s"></param>
         public void SetPicture(Image image, string s)
         {
             if(InvokeRequired)
             {
-                this.Invoke(new Action<Image,string>(SetPicture), new object[] { image,s });
+                Invoke(new Action<Image, string>(SetPicture), new object[] { image, s });
                 return;
             }
             if(s == "Kitchen")
-                this.pictureBox_Kitchen.Image = image;
+                pictureBox_Kitchen.Image = image;
             else if(s == "Living")
-                this.pictureBox_Living.Image = image;
+                pictureBox_Living.Image = image;
             else if(s == "Family")
-                this.pictureBox_Family.Image = image;
+                pictureBox_Family.Image = image;
             else if(s == "Pantry")
-                this.pictureBox_Pantry.Image = image;
+                pictureBox_Pantry.Image = image;
             else if(s == "Bathroom")
-                this.pictureBox_Bathroom.Image = image;
+                pictureBox_Bathroom.Image = image;
             else if(s == "Entrance")
-                this.pictureBox_Entrance.Image = image;
+                pictureBox_Entrance.Image = image;
             else if(s == "Entrance 2")
-                this.pictureBox_Entrance2.Image = image;
+                pictureBox_Entrance2.Image = image;
             else if(s == "Laundry")
-                this.pictureBox_Laundry.Image = image;
-        }
+                pictureBox_Laundry.Image = image;
 
+        }
+        /// <summary>
+        /// Used to trigger a Power-up in the Game Class
+        /// is used in it's own thread so the Front-end won't hang it self
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void buttonPowerUp_Click(object sender, EventArgs e)
+        {
+            Thread thread = new Thread(game.ActivatePowerUp);
+            thread.Start();
+        }
+        
+        #region toggle lamps
+        private void pictureBox_Kitchen_Click(object sender, EventArgs e)
+        {
+            game.ToggleLamp("Lampje - Kitchen");
+
+        }
         private void pictureBox_Living_Click(object sender, EventArgs e)
         {
+            game.ToggleLamp("Lampje - Living");
+        }
+        private void pictureBox_Laundry_Click(object sender, EventArgs e)
+        {
+            game.ToggleLamp("Lampje - Laundry");
 
         }
+        private void pictureBox_Pantry_Click(object sender, EventArgs e)
+        {
+            game.ToggleLamp("Lampje - Pantry");
+
+        }
+        private void pictureBox_Entrance2_Click(object sender, EventArgs e)
+        {
+            game.ToggleLamp("Lampje - Entrance 2");
+
+        }
+        private void pictureBox_Bathroom_Click(object sender, EventArgs e)
+        {
+            game.ToggleLamp("Lampje - Bathroom");
+
+        }
+        private void pictureBox_Entrance_Click(object sender, EventArgs e)
+        {
+            game.ToggleLamp("Lampje - Entrance");
+
+        }
+        private void pictureBox_Family_Click(object sender, EventArgs e)
+        {
+            game.ToggleLamp("Lampje - Family");
+
+        }
+        #endregion
+        
+        #region hover Floorplan
+        private void pictureBox_Kitchen_MouseHover(object sender, EventArgs e)
+        {
+            SelectCameraFeed.Text = "Kitchen";
+        }
+        private void pictureBox_Living_MouseHover(object sender, EventArgs e)
+        {
+            SelectCameraFeed.Text = "Living";
+
+        }
+        private void pictureBox_Pantry_MouseHover(object sender, EventArgs e)
+        {
+            SelectCameraFeed.Text = "Pantry";
+
+        }
+        private void pictureBox_Laundry_MouseHover(object sender, EventArgs e)
+        {
+            SelectCameraFeed.Text = "Laundry";
+
+        }
+        private void pictureBox_Bathroom_MouseHover(object sender, EventArgs e)
+        {
+            SelectCameraFeed.Text = "Bathroom";
+
+        }
+        private void pictureBox_Entrance2_MouseHover(object sender, EventArgs e)
+        {
+            SelectCameraFeed.Text = "Entrance 2";
+
+        }
+        private void pictureBox_Entrance_MouseHover(object sender, EventArgs e)
+        {
+            SelectCameraFeed.Text = "Entrance";
+
+        }
+        private void pictureBox_Family_MouseHover(object sender, EventArgs e)
+        {
+            SelectCameraFeed.Text = "Family";
+
+        }
+        #endregion
     }
 }

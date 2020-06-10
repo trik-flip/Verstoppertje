@@ -107,7 +107,7 @@
             // 
             this.richTextBox1.Location = new System.Drawing.Point(13, 72);
             this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.Size = new System.Drawing.Size(334, 600);
+            this.richTextBox1.Size = new System.Drawing.Size(334, 198);
             this.richTextBox1.TabIndex = 5;
             this.richTextBox1.Text = "";
             // 
@@ -127,6 +127,7 @@
             this.buttonPowerUp.TabIndex = 7;
             this.buttonPowerUp.Text = "Use Power-Up";
             this.buttonPowerUp.UseVisualStyleBackColor = true;
+            this.buttonPowerUp.Click += new System.EventHandler(this.buttonPowerUp_Click);
             // 
             // pictureBox_Kitchen
             // 
@@ -137,6 +138,7 @@
             this.pictureBox_Kitchen.TabIndex = 8;
             this.pictureBox_Kitchen.TabStop = false;
             this.pictureBox_Kitchen.Click += new System.EventHandler(this.pictureBox_Kitchen_Click);
+            this.pictureBox_Kitchen.MouseHover += new System.EventHandler(this.pictureBox_Kitchen_MouseHover);
             // 
             // pictureBox_Living
             // 
@@ -147,6 +149,7 @@
             this.pictureBox_Living.TabIndex = 9;
             this.pictureBox_Living.TabStop = false;
             this.pictureBox_Living.Click += new System.EventHandler(this.pictureBox_Living_Click);
+            this.pictureBox_Living.MouseHover += new System.EventHandler(this.pictureBox_Living_MouseHover);
             // 
             // pictureBox_Family
             // 
@@ -156,6 +159,8 @@
             this.pictureBox_Family.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBox_Family.TabIndex = 10;
             this.pictureBox_Family.TabStop = false;
+            this.pictureBox_Family.Click += new System.EventHandler(this.pictureBox_Family_Click);
+            this.pictureBox_Family.MouseHover += new System.EventHandler(this.pictureBox_Family_MouseHover);
             // 
             // pictureBox_Bathroom
             // 
@@ -165,6 +170,8 @@
             this.pictureBox_Bathroom.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBox_Bathroom.TabIndex = 11;
             this.pictureBox_Bathroom.TabStop = false;
+            this.pictureBox_Bathroom.Click += new System.EventHandler(this.pictureBox_Bathroom_Click);
+            this.pictureBox_Bathroom.MouseHover += new System.EventHandler(this.pictureBox_Bathroom_MouseHover);
             // 
             // pictureBox_Laundry
             // 
@@ -174,6 +181,8 @@
             this.pictureBox_Laundry.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBox_Laundry.TabIndex = 12;
             this.pictureBox_Laundry.TabStop = false;
+            this.pictureBox_Laundry.Click += new System.EventHandler(this.pictureBox_Laundry_Click);
+            this.pictureBox_Laundry.MouseHover += new System.EventHandler(this.pictureBox_Laundry_MouseHover);
             // 
             // pictureBox_Pantry
             // 
@@ -183,6 +192,8 @@
             this.pictureBox_Pantry.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBox_Pantry.TabIndex = 13;
             this.pictureBox_Pantry.TabStop = false;
+            this.pictureBox_Pantry.Click += new System.EventHandler(this.pictureBox_Pantry_Click);
+            this.pictureBox_Pantry.MouseHover += new System.EventHandler(this.pictureBox_Pantry_MouseHover);
             // 
             // pictureBox_Entrance2
             // 
@@ -192,6 +203,8 @@
             this.pictureBox_Entrance2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBox_Entrance2.TabIndex = 14;
             this.pictureBox_Entrance2.TabStop = false;
+            this.pictureBox_Entrance2.Click += new System.EventHandler(this.pictureBox_Entrance2_Click);
+            this.pictureBox_Entrance2.MouseHover += new System.EventHandler(this.pictureBox_Entrance2_MouseHover);
             // 
             // pictureBox_Entrance
             // 
@@ -201,6 +214,8 @@
             this.pictureBox_Entrance.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBox_Entrance.TabIndex = 15;
             this.pictureBox_Entrance.TabStop = false;
+            this.pictureBox_Entrance.Click += new System.EventHandler(this.pictureBox_Entrance_Click);
+            this.pictureBox_Entrance.MouseHover += new System.EventHandler(this.pictureBox_Entrance_MouseHover);
             // 
             // Zoeker_App
             // 
