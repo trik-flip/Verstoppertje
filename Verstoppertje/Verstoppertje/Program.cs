@@ -16,7 +16,7 @@ namespace Verstoppertje
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+            Application.Run(new Zoeker_App());
         }
     }
 }
