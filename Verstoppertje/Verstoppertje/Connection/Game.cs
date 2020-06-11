@@ -39,7 +39,7 @@ namespace Verstoppertje.Connection
         private const int REFRESHRATE = 30;
 #endif
         // TODO pak id van "knopje - living"
-        private const int IDBUUT = 1;
+        private const int BUUTID = 10;
         #endregion
         private readonly string[] Rooms = { "Kitchen", "Entrance", "Entrance 2", "Pantry", "Laundry", "Family", "Living", "Bathroom" };
         private Dictionary<string, Image> ROOMPICTURES_HGHLIGHT = new Dictionary<string, Image>();
@@ -224,6 +224,31 @@ namespace Verstoppertje.Connection
                 }
             }
         }
+        private void GetBuutStatus()
+        {
+            while(true)
+            {
+                Thread.Sleep(REFRESHRATE * 100);
+                Dictionary<string, object> json;
+                lock(client)
+                {
+                    var response = client.DownloadString(URL + SINGELDEVICE + BUUTID);
+                    client.Dispose();
+                    json = JsonConvert.DeserializeObject<Dictionary<string, object>>(response.ToString());
+                }
+                string jsonString = "{" + json["result"].ToString().Substring(1, json["result"].ToString().Length - 4).Split('{')[1];
+                json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
+                string switchStatus = json["Status"].ToString();
+                Switch oldSwitch = switchesList.Find(x => x.Idx == BUUTID);
+                if(oldSwitch.Status != switchStatus)
+                {
+                    lock(switchesList)
+                    {
+                        switchesList[switchesList.IndexOf(oldSwitch)].Status = switchStatus;
+                    }
+                }
+            }
+        }
         // Limiteren tot 1 lamp aan per keer, of 1 lamp aanzetten per 5 seconden ofzo
         /// <summary>
         /// turns a lamp on when it's off, and off when it's on, used by the seeker to find the hider
@@ -300,7 +325,7 @@ namespace Verstoppertje.Connection
         }
 
         // * TODO: Check of zoeker in dezelfde kamer is als de verstopper
-        // -> TODO: Check if Buut is pressed
+        // * TODO: Check if Buut is pressed
         // TODO: Power-up invisible vertopper
         // TODO: Random generate location of buut
         // TODO: Time voor spel duur
@@ -324,6 +349,7 @@ namespace Verstoppertje.Connection
                     json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
                     string switchStatus = json["Status"].ToString();
                     Switch oldSwitch = switchesList.Find(x => x.Idx == id);
+                    Console.WriteLine(oldSwitch.Idx);
                     if(oldSwitch.Status != switchStatus)
                     {
                         lock(switchesList)
@@ -342,7 +368,15 @@ namespace Verstoppertje.Connection
             {
                 thread.Abort();
             }
-            zoekerApp.SetRichTextBox("Je hebt gewonnen");
+            zoekerApp.SetRichTextBox("Je hebt Gewonnen");
+        }
+        public void Lose()
+        {
+            foreach(Thread thread in openThreads)
+            {
+                thread.Abort();
+            }
+            zoekerApp.SetRichTextBox("Je hebt Verloren");
         }
     }
 }
