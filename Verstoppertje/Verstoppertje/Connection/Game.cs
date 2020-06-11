@@ -33,7 +33,13 @@ namespace Verstoppertje.Connection
         private const int CAMERATIMEOUT = 10;
         private const int POWERUPTIMEOUT = 8;
         private const int POWERUPTIME = 5;
+#if DEBUG
         private const int REFRESHRATE = 2;
+#else
+        private const int REFRESHRATE = 30;
+#endif
+        // TODO pak id van "knopje - living"
+        private const int IDBUUT = 1;
         #endregion
         private readonly string[] Rooms = { "Kitchen", "Entrance", "Entrance 2", "Pantry", "Laundry", "Family", "Living", "Bathroom" };
         private Dictionary<string, Image> ROOMPICTURES_HGHLIGHT = new Dictionary<string, Image>();
@@ -106,6 +112,7 @@ namespace Verstoppertje.Connection
         public void Start()
         {
             Thread thread = new Thread(GameLoop);
+            openThreads.Add(thread);
             thread.Start();
         }
 
@@ -210,7 +217,6 @@ namespace Verstoppertje.Connection
                 Switch oldSwitch = switchesList.Find(x => x.Idx == id);
                 if(oldSwitch.Status != switchStatus)
                 {
-
                     lock(switchesList)
                     {
                         switchesList[switchesList.IndexOf(oldSwitch)].Status = switchStatus;
@@ -274,6 +280,7 @@ namespace Verstoppertje.Connection
         /// is limited to every CAMERATIMEOUT seconds
         /// </summary>
         /// <returns></returns>
+        // TODO: Check if Motion Sensor is active, otherwise show black
         public bool CameraCheck()
         {
             if((DateTime.Now.Second - timeStampCamera) > CAMERATIMEOUT)
@@ -288,12 +295,54 @@ namespace Verstoppertje.Connection
 #else
                 zoekerApp.SetRichTextBox("Nog " + (CAMERATIMEOUT - (DateTime.Now.Second - timeStampCamera)) + " Seconde voordat camera actief is");
 #endif
-
                 return false;
             }
         }
-        // TODO: Check of zoeker in dezelfde kamer is als de verstopper
-        #endregion
 
+        // * TODO: Check of zoeker in dezelfde kamer is als de verstopper
+        // -> TODO: Check if Buut is pressed
+        // TODO: Power-up invisible vertopper
+        // TODO: Random generate location of buut
+        // TODO: Time voor spel duur
+        // TODO: Score op basis van tijd, aantal gokken, aantal power-ups, aantal camera uses
+        #endregion
+        public bool checkKnop(string room)
+        {
+            foreach(Switch @switch in switchesList)
+            {
+                if(@switch.Name == "Knopje - " + room)
+                {
+                    int id = @switch.Idx;
+                    Dictionary<string, object> json;
+                    lock(client)
+                    {
+                        var response = client.DownloadString(URL + SINGELDEVICE + id);
+                        client.Dispose();
+                        json = JsonConvert.DeserializeObject<Dictionary<string, object>>(response.ToString());
+                    }
+                    string jsonString = "{" + json["result"].ToString().Substring(1, json["result"].ToString().Length - 4).Split('{')[1];
+                    json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
+                    string switchStatus = json["Status"].ToString();
+                    Switch oldSwitch = switchesList.Find(x => x.Idx == id);
+                    if(oldSwitch.Status != switchStatus)
+                    {
+                        lock(switchesList)
+                        {
+                            switchesList[switchesList.IndexOf(oldSwitch)].Status = switchStatus;
+                        }
+                    }
+                    return (json["Status"].ToString() == "On");
+                }
+            }
+            return false;
+        }
+        public void Win()
+        {
+            foreach(Thread thread in openThreads)
+            {
+                thread.Abort();
+            }
+            zoekerApp.SetRichTextBox("Je hebt gewonnen");
+        }
     }
 }

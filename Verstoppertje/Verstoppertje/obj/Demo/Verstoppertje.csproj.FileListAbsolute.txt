@@ -28,3 +28,4 @@ C:\Users\Philip Bollen\source\repos\Verstoppertje\Verstoppertje\Verstoppertje\ob
 C:\Users\Philip Bollen\source\repos\Verstoppertje\Verstoppertje\Verstoppertje\obj\Demo\Verstoppertje.csproj.CopyComplete
 C:\Users\Philip Bollen\source\repos\Verstoppertje\Verstoppertje\Verstoppertje\obj\Demo\Verstoppertje.exe
 C:\Users\Philip Bollen\source\repos\Verstoppertje\Verstoppertje\Verstoppertje\obj\Demo\Verstoppertje.pdb
+C:\Users\Philip Bollen\source\repos\Verstoppertje\Verstoppertje\Verstoppertje\obj\Demo\Verstoppertje.csprojAssemblyReference.cache

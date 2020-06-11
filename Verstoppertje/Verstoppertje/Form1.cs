@@ -28,7 +28,7 @@ namespace Verstoppertje
             game = new Game(this);
             game.Start();
         }
-        
+
         /// <summary>
         /// Set's the picture displayd in the camera Feed pictureBox
         /// </summary>
@@ -56,7 +56,7 @@ namespace Verstoppertje
                     CameraFeed.Image = Properties.Resources.Laundry;
             }
         }
-        
+
         #region RichTextBox
         /// <summary>
         /// Is used to add text to the RichTextBox
@@ -87,7 +87,7 @@ namespace Verstoppertje
             richTextBox1.Text = s;
         }
         #endregion
-        
+        // TODO: Set to white if power-up not active
         /// <summary>
         /// Is used by the Game class, to set a picture to the Front-end
         /// Is used by another Thread then the Front-end is run by
@@ -130,49 +130,58 @@ namespace Verstoppertje
             Thread thread = new Thread(game.ActivatePowerUp);
             thread.Start();
         }
-        
+
         #region toggle lamps
         private void pictureBox_Kitchen_Click(object sender, EventArgs e)
         {
             game.ToggleLamp("Lampje - Kitchen");
-
+            if(game.checkKnop("Kitchen"))
+            { game.Win(); }
         }
         private void pictureBox_Living_Click(object sender, EventArgs e)
         {
             game.ToggleLamp("Lampje - Living");
+            if(game.checkKnop("Living"))
+            { game.Win(); }
         }
         private void pictureBox_Laundry_Click(object sender, EventArgs e)
         {
             game.ToggleLamp("Lampje - Laundry");
-
+            if(game.checkKnop("Laundry"))
+            { game.Win(); }
         }
         private void pictureBox_Pantry_Click(object sender, EventArgs e)
         {
             game.ToggleLamp("Lampje - Pantry");
-
+            if(game.checkKnop("Pantry"))
+            { game.Win(); }
         }
         private void pictureBox_Entrance2_Click(object sender, EventArgs e)
         {
             game.ToggleLamp("Lampje - Entrance 2");
-
+            if(game.checkKnop("Entrance 2"))
+            { game.Win(); }
         }
         private void pictureBox_Bathroom_Click(object sender, EventArgs e)
         {
             game.ToggleLamp("Lampje - Bathroom");
-
+            if(game.checkKnop("Bathroom"))
+            { game.Win(); }
         }
         private void pictureBox_Entrance_Click(object sender, EventArgs e)
         {
             game.ToggleLamp("Lampje - Entrance");
-
+            if(game.checkKnop("Entrance"))
+            { game.Win(); }
         }
         private void pictureBox_Family_Click(object sender, EventArgs e)
         {
             game.ToggleLamp("Lampje - Family");
-
+            if(game.checkKnop("Family"))
+            { game.Win(); }
         }
         #endregion
-        
+
         #region hover Floorplan
         private void pictureBox_Kitchen_MouseHover(object sender, EventArgs e)
         {
