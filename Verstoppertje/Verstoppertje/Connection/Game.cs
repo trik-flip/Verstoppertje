@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Linq;
 using System.Net;
 using System.Reflection.Emit;
+using System.Runtime.Remoting;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -27,6 +28,7 @@ namespace Verstoppertje.Connection
         private const string ALLDEVICES = "type=devices&filter=all&used=true&order=Name";
         private const string TOGGLESWITCH = "type=command&param=switchlight&idx={0}&switchcmd={1}";
         #endregion
+
         #region game configurations
         private const int STARTID = 38;
         private const int ENDID = 45;
@@ -38,9 +40,10 @@ namespace Verstoppertje.Connection
 #else
         private const int REFRESHRATE = 30;
 #endif
-        // TODO pak id van "knopje - living"
-        private const int BUUTID = 10;
         #endregion
+
+        #region Game variables
+        private int BuutId;
         private readonly string[] Rooms = { "Kitchen", "Entrance", "Entrance 2", "Pantry", "Laundry", "Family", "Living", "Bathroom" };
         private Dictionary<string, Image> ROOMPICTURES_HGHLIGHT = new Dictionary<string, Image>();
         private Dictionary<string, Image> ROOMPICTURES = new Dictionary<string, Image>();
@@ -53,6 +56,9 @@ namespace Verstoppertje.Connection
         private WebClient client = new WebClient();
         private List<Switch> switchesList = new List<Switch>();
         private Zoeker_App zoekerApp;
+        private bool playing = true;
+        #endregion
+        private string room;
         #region Setup-up fase
         /// <summary>
         /// Creates a Game, it handels everything, from picture replacement, to web requests. to powerup/ camera usage.
@@ -123,28 +129,37 @@ namespace Verstoppertje.Connection
         /// </summary>
         private void GameLoop()
         {
+
             for(int i = STARTID; i <= ENDID; i++)
             {
                 Thread thread = new Thread(() => GetLampStatus(i));
                 openThreads.Add(thread);
                 thread.Start();
-                Thread.Sleep(100);
+                Thread.Sleep(200);
             }
-            while(true)
+            Thread buutThread = new Thread(GetBuutStatus);
+            openThreads.Add(buutThread);
+            buutThread.Start();
+#if DEBUG
+            string text = "";
+#endif
+            while(playing)
             {
                 Thread.Sleep(REFRESHRATE * 100);
 #if DEBUG
-                zoekerApp.SetRichTextBox("");
+                zoekerApp.SetRichTextBox(text);
+                text = "";
 #endif
                 foreach(Switch singleSwitch in switchesList)
                 {
                     if(singleSwitch.Idx >= STARTID && singleSwitch.Idx <= ENDID)
                     {
 #if DEBUG
-                        zoekerApp.addToRichTextBox(singleSwitch.ToString() + "\n");
+                        text += singleSwitch.ToString() + "\n";
 #endif
-                        foreach(string room in Rooms)
+                        foreach(string roome in Rooms)
                         {
+                            this.room = roome;
 #if DEBUG
                             if(singleSwitch.Name.Equals("Lampje - " + room) && singleSwitch.Status.Equals("On"))
 #else
@@ -153,7 +168,8 @@ namespace Verstoppertje.Connection
                             {
                                 zoekerApp.SetPicture(ROOMPICTURES_HGHLIGHT[room], room);
                             }
-                            else if(singleSwitch.Name.Equals("Lampje - " + room) && singleSwitch.Status.Equals("Off"))
+                            //else if(singleSwitch.Name.Equals("Lampje - " + room) && singleSwitch.Status.Equals("Off"))
+                            else if(singleSwitch.Name.Equals("Lampje - " + room))
                             {
                                 zoekerApp.SetPicture(ROOMPICTURES[room], room);
                             }
@@ -190,6 +206,22 @@ namespace Verstoppertje.Connection
             {
                 zoekerApp.SetPicture(ROOMPICTURES[room], room);
             }
+            List<int> knoppenList = new List<int>();
+            foreach(Switch @switch in switchesList)
+            {
+                if(@switch.Name.Contains("Knopje"))
+                {
+                    knoppenList.Add(@switch.Idx);
+                }
+            }
+#if DEBUG
+            // dit is de woonkamer AKA "Living"
+            BuutId = 10;
+#else
+            Random random = new Random();
+            BuutId = knoppenList[random.Next(knoppenList.Count)];
+            Console.WriteLine(BuutId);
+#endif
         }
         #endregion
 
@@ -224,6 +256,9 @@ namespace Verstoppertje.Connection
                 }
             }
         }
+        /// <summary>
+        /// Gets the status of the buut, this methode is run from a thread so it won't lag the front-end
+        /// </summary>
         private void GetBuutStatus()
         {
             while(true)
@@ -232,20 +267,24 @@ namespace Verstoppertje.Connection
                 Dictionary<string, object> json;
                 lock(client)
                 {
-                    var response = client.DownloadString(URL + SINGELDEVICE + BUUTID);
+                    var response = client.DownloadString(URL + SINGELDEVICE + BuutId);
                     client.Dispose();
                     json = JsonConvert.DeserializeObject<Dictionary<string, object>>(response.ToString());
                 }
                 string jsonString = "{" + json["result"].ToString().Substring(1, json["result"].ToString().Length - 4).Split('{')[1];
                 json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
                 string switchStatus = json["Status"].ToString();
-                Switch oldSwitch = switchesList.Find(x => x.Idx == BUUTID);
+                Switch oldSwitch = switchesList.Find(x => x.Idx == BuutId);
                 if(oldSwitch.Status != switchStatus)
                 {
                     lock(switchesList)
                     {
                         switchesList[switchesList.IndexOf(oldSwitch)].Status = switchStatus;
                     }
+                }
+                if(switchStatus == "On")
+                {
+                    Lose();
                 }
             }
         }
@@ -305,9 +344,9 @@ namespace Verstoppertje.Connection
         /// is limited to every CAMERATIMEOUT seconds
         /// </summary>
         /// <returns></returns>
-        // TODO: Check if Motion Sensor is active, otherwise show black
         public bool CameraCheck()
         {
+            string extra = "Motion Sensor - ";
             if((DateTime.Now.Second - timeStampCamera) > CAMERATIMEOUT)
             {
                 timeStampCamera = DateTime.Now.Second;
@@ -323,14 +362,12 @@ namespace Verstoppertje.Connection
                 return false;
             }
         }
-
-        // * TODO: Check of zoeker in dezelfde kamer is als de verstopper
-        // * TODO: Check if Buut is pressed
-        // TODO: Power-up invisible vertopper
-        // TODO: Random generate location of buut
-        // TODO: Time voor spel duur
-        // TODO: Score op basis van tijd, aantal gokken, aantal power-ups, aantal camera uses
-        #endregion
+        /// <summary>
+        /// Checks if the knop is pressed in the same room
+        /// indicating the hider is in that room
+        /// </summary>
+        /// <param name="room"></param>
+        /// <returns></returns>
         public bool checkKnop(string room)
         {
             foreach(Switch @switch in switchesList)
@@ -364,6 +401,7 @@ namespace Verstoppertje.Connection
         }
         public void Win()
         {
+            playing = false;
             foreach(Thread thread in openThreads)
             {
                 thread.Abort();
@@ -372,11 +410,24 @@ namespace Verstoppertje.Connection
         }
         public void Lose()
         {
+            playing = false;
             foreach(Thread thread in openThreads)
             {
                 thread.Abort();
             }
             zoekerApp.SetRichTextBox("Je hebt Verloren");
         }
+        #endregion
+
+        #region TODO's
+        // Done: Check of zoeker in dezelfde kamer is als de verstopper
+        // Done: Check if Buut is pressed
+        // Done: Random generate location of buut
+        // -> TODO: Check if Motion Sensor is active, otherwise show black camera Feed
+        // Done: Schakel alles uit als gewonnen of verloren
+        // TODO: Power-up invisible vertopper
+        // TODO: Time voor spel duur
+        // TODO: Score op basis van tijd, aantal gokken, aantal power-ups, aantal camera uses
+        #endregion
     }
 }

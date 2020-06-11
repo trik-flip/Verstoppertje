@@ -18,7 +18,9 @@ namespace Verstoppertje
 {
     public partial class Zoeker_App : Form
     {
+        #region Variables
         private Game game;
+        #endregion
         /// <summary>
         /// Runs front-end and opens Back-end in another Thread
         /// </summary>
@@ -28,7 +30,7 @@ namespace Verstoppertje
             game = new Game(this);
             game.Start();
         }
-
+        #region User Buttons
         /// <summary>
         /// Set's the picture displayd in the camera Feed pictureBox
         /// </summary>
@@ -36,6 +38,7 @@ namespace Verstoppertje
         /// <param name="e"></param>
         private void button1_Click(object sender, EventArgs e)
         {
+            // TODO: Set to snow if motion sensors are off
             if(game != null && game.CameraCheck())
             {
                 if(SelectCameraFeed.Text == "Kitchen")
@@ -57,21 +60,20 @@ namespace Verstoppertje
             }
         }
 
-        #region RichTextBox
         /// <summary>
-        /// Is used to add text to the RichTextBox
-        /// is used by another Thread
+        /// Used to trigger a Power-up in the Game Class
+        /// is used in it's own thread so the Front-end won't hang it self
         /// </summary>
-        /// <param name="s"></param>
-        public void addToRichTextBox(string s)
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void buttonPowerUp_Click(object sender, EventArgs e)
         {
-            if(InvokeRequired)
-            {
-                Invoke(new Action<string>(addToRichTextBox), new object[] { s });
-                return;
-            }
-            richTextBox1.Text += s;
+            Thread thread = new Thread(game.ActivatePowerUp);
+            thread.Start();
         }
+        #endregion
+
+        #region Game class methodes
         /// <summary>
         /// Is used to set the text of the RichTextBox
         /// Is used by another Thread
@@ -86,7 +88,6 @@ namespace Verstoppertje
             }
             richTextBox1.Text = s;
         }
-        #endregion
         // TODO: Set to white if power-up not active
         /// <summary>
         /// Is used by the Game class, to set a picture to the Front-end
@@ -119,17 +120,7 @@ namespace Verstoppertje
                 pictureBox_Laundry.Image = image;
 
         }
-        /// <summary>
-        /// Used to trigger a Power-up in the Game Class
-        /// is used in it's own thread so the Front-end won't hang it self
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void buttonPowerUp_Click(object sender, EventArgs e)
-        {
-            Thread thread = new Thread(game.ActivatePowerUp);
-            thread.Start();
-        }
+        #endregion
 
         #region toggle lamps
         private void pictureBox_Kitchen_Click(object sender, EventArgs e)
