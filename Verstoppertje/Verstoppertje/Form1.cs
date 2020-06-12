@@ -122,7 +122,9 @@ namespace Verstoppertje
         }
         #endregion
 
-        #region toggle lamps
+        #region interactieve plattengrond
+        // TODO: lamp niet meer aan en uit zetten bij het klikken, alleen foto veranderen
+
         private void pictureBox_Kitchen_Click(object sender, EventArgs e)
         {
             game.ToggleLamp("Lampje - Kitchen");

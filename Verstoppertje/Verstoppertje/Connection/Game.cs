@@ -34,11 +34,11 @@ namespace Verstoppertje.Connection
         private const int ENDID = 45;
         private const int CAMERATIMEOUT = 10;
         private const int POWERUPTIMEOUT = 8;
-        private const int POWERUPTIME = 5;
+        private const int POWERUPTIME = 20 + POWERUPTIMEOUT;
 #if DEBUG
         private const int REFRESHRATE = 2;
 #else
-        private const int REFRESHRATE = 30;
+        private const int REFRESHRATE = 10;
 #endif
         #endregion
 
@@ -118,7 +118,7 @@ namespace Verstoppertje.Connection
         public void Start()
         {
             Thread thread = new Thread(GameLoop);
-            openThreads.Add(thread);
+            //openThreads.Add(thread);
             thread.Start();
         }
 
@@ -138,7 +138,7 @@ namespace Verstoppertje.Connection
                 Thread.Sleep(200);
             }
             Thread buutThread = new Thread(GetBuutStatus);
-            openThreads.Add(buutThread);
+            //openThreads.Add(buutThread);
             buutThread.Start();
 #if DEBUG
             string text = "";
@@ -220,7 +220,7 @@ namespace Verstoppertje.Connection
 #else
             Random random = new Random();
             BuutId = knoppenList[random.Next(knoppenList.Count)];
-            Console.WriteLine(BuutId);
+            Console.WriteLine(switchesList.Find(x => x.Idx == BuutId).Name);
 #endif
         }
         #endregion
@@ -346,7 +346,6 @@ namespace Verstoppertje.Connection
         /// <returns></returns>
         public bool CameraCheck()
         {
-            string extra = "Motion Sensor - ";
             if((DateTime.Now.Second - timeStampCamera) > CAMERATIMEOUT)
             {
                 timeStampCamera = DateTime.Now.Second;
@@ -411,10 +410,12 @@ namespace Verstoppertje.Connection
         public void Lose()
         {
             playing = false;
+            Console.WriteLine("||||||||||||||||||||||");
             foreach(Thread thread in openThreads)
             {
                 thread.Abort();
             }
+            Console.WriteLine("-------------------------------");
             zoekerApp.SetRichTextBox("Je hebt Verloren");
         }
         #endregion
@@ -423,11 +424,13 @@ namespace Verstoppertje.Connection
         // Done: Check of zoeker in dezelfde kamer is als de verstopper
         // Done: Check if Buut is pressed
         // Done: Random generate location of buut
-        // -> TODO: Check if Motion Sensor is active, otherwise show black camera Feed
         // Done: Schakel alles uit als gewonnen of verloren
+        // -> TODO: Check if Motion Sensor is active, otherwise show black camera Feed
         // TODO: Power-up invisible vertopper
         // TODO: Time voor spel duur
         // TODO: Score op basis van tijd, aantal gokken, aantal power-ups, aantal camera uses
+        // TODO: lamp niet meer aan en uit zetten bij het klikken
+        // TODO: Weergeven in welke kamer de buut is (in de console) 
         #endregion
     }
 }

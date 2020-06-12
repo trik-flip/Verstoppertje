@@ -34,7 +34,6 @@
             this.FloorPlan = new System.Windows.Forms.PictureBox();
             this.CameraFeed = new System.Windows.Forms.PictureBox();
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.buttonPowerUp = new System.Windows.Forms.Button();
             this.pictureBox_Kitchen = new System.Windows.Forms.PictureBox();
             this.pictureBox_Living = new System.Windows.Forms.PictureBox();
@@ -111,19 +110,11 @@
             this.richTextBox1.TabIndex = 5;
             this.richTextBox1.Text = "";
             // 
-            // comboBox1
-            // 
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Location = new System.Drawing.Point(140, 13);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(121, 24);
-            this.comboBox1.TabIndex = 6;
-            // 
             // buttonPowerUp
             // 
-            this.buttonPowerUp.Location = new System.Drawing.Point(141, 44);
+            this.buttonPowerUp.Location = new System.Drawing.Point(141, 13);
             this.buttonPowerUp.Name = "buttonPowerUp";
-            this.buttonPowerUp.Size = new System.Drawing.Size(120, 23);
+            this.buttonPowerUp.Size = new System.Drawing.Size(142, 54);
             this.buttonPowerUp.TabIndex = 7;
             this.buttonPowerUp.Text = "Use Power-Up";
             this.buttonPowerUp.UseVisualStyleBackColor = true;
@@ -232,7 +223,6 @@
             this.Controls.Add(this.pictureBox_Living);
             this.Controls.Add(this.pictureBox_Kitchen);
             this.Controls.Add(this.buttonPowerUp);
-            this.Controls.Add(this.comboBox1);
             this.Controls.Add(this.richTextBox1);
             this.Controls.Add(this.CameraFeed);
             this.Controls.Add(this.FloorPlan);
@@ -262,7 +252,6 @@
         private System.Windows.Forms.PictureBox FloorPlan;
         private System.Windows.Forms.PictureBox CameraFeed;
         private System.Windows.Forms.RichTextBox richTextBox1;
-        private System.Windows.Forms.ComboBox comboBox1;
         private System.Windows.Forms.Button buttonPowerUp;
         private System.Windows.Forms.PictureBox pictureBox_Kitchen;
         private System.Windows.Forms.PictureBox pictureBox_Living;
